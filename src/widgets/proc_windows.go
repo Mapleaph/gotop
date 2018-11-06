@@ -5,13 +5,25 @@ import (
 )
 
 func (self *Proc) update() {
-	psProcesses, _ := psProc.Processes()
+	psProcesses, err := psProc.Processes()
+	if err != nil {
+		return err
+	}
 	processes := make([]Process, len(psProcesses))
 	for i, psProcess := range psProcesses {
 		pid := psProcess.Pid
-		command, _ := psProcess.Name()
-		cpu, _ := psProcess.CPUPercent()
-		mem, _ := psProcess.MemoryPercent()
+		command, err := psProcess.Name()
+		if err != nil {
+			return err
+		}
+		cpu, err := psProcess.CPUPercent()
+		if err != nil {
+			return err
+		}
+		mem, err := psProcess.MemoryPercent()
+		if err != nil {
+			return err
+		}
 
 		processes[i] = Process{
 			int(pid),

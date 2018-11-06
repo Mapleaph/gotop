@@ -11,7 +11,7 @@ type TemperatureStat struct {
 	Temperature float64 `json:"sensorTemperature"`
 }
 
-func SensorsTemperatures() ([]TemperatureStat, error) {
+func SensorsTemperatures() []TemperatureStat {
 	temperatureKeys := []string{
 		C.AMBIENT_AIR_0,
 		C.AMBIENT_AIR_1,
@@ -46,11 +46,14 @@ func SensorsTemperatures() ([]TemperatureStat, error) {
 			Temperature: float64(C.get_tmp(C.CString(key), C.CELSIUS)),
 		})
 	}
-	return temperatures, nil
+	return temperatures
 }
 
 func (self *Temp) update() {
-	sensors, _ := SensorsTemperatures()
+	sensors, err := SensorsTemperatures()
+	if err != nil {
+		return err
+	}
 	for _, sensor := range sensors {
 		self.Data[sensor.SensorKey] = int(sensor.Temperature)
 	}

@@ -7,7 +7,10 @@ import (
 )
 
 func (self *Temp) update() {
-	sensors, _ := psHost.SensorsTemperatures()
+	sensors, err := psHost.SensorsTemperatures()
+	if err != nil {
+		// return err
+	}
 	for _, sensor := range sensors {
 		// only sensors with input in their name are giving us live temp info
 		if strings.Contains(sensor.SensorKey, "input") {

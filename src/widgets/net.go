@@ -45,7 +45,10 @@ func NewNet() *Net {
 
 func (self *Net) update() {
 	// `false` causes psutil to group all network activity
-	interfaces, _ := psNet.IOCounters(false)
+	interfaces, err := psNet.IOCounters(false)
+	if err != nil {
+		// return err
+	}
 	curRecvTotal := interfaces[0].BytesRecv
 	curSentTotal := interfaces[0].BytesSent
 	var recvRecent uint64 = 0

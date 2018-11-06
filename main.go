@@ -34,6 +34,8 @@ var (
 
 	colorscheme = colorschemes.Default
 
+	configDir = getConfigDir()
+
 	minimal      = false
 	widgetCount  = 6
 	interval     = time.Second
@@ -73,10 +75,15 @@ Colorschemes:
   monokai
 `
 
-	args, _ := docopt.ParseArgs(usage, os.Args[1:], version)
+	args, err := docopt.ParseArgs(usage, os.Args[1:], version)
+	if err != nil {
+		// return err
+	}
 
-	if val, _ := args["--color"]; val != nil {
-		handleColorscheme(val.(string))
+	val, _ := args["--color"]
+	if val != nil {
+		val, _ := val.(string)
+		handleColorscheme(val)
 	}
 
 	minimal, _ = args["--minimal"].(bool)
@@ -85,7 +92,11 @@ Colorschemes:
 	}
 
 	rateStr, _ := args["--rate"].(string)
-	rate, _ := strconv.ParseFloat(rateStr, 64)
+	rate, err := strconv.ParseFloat(rateStr, 64)
+	if err != nil {
+		fmt.Println("hi")
+		// return err
+	}
 	if rate < 1 {
 		interval = time.Second * time.Duration(1/rate)
 	} else {
@@ -111,14 +122,18 @@ func handleColorscheme(cs string) {
 	}
 }
 
+func getConfigDir() string {
+	xdg := os.Getenv("XDG_CONFIG_HOME")
+	if xdg == "" {
+		return os.ExpandEnv("$HOME") + "/.config/gotop/"
+	}
+	return xdg
+}
+
 // getCustomColorscheme	tries to read a custom json colorscheme from
 // {$XDG_CONFIG_HOME,~/.config}/gotop/{name}.json
 func getCustomColorscheme(name string) colorschemes.Colorscheme {
-	xdg := os.Getenv("XDG_CONFIG_HOME")
-	if xdg == "" {
-		xdg = os.ExpandEnv("$HOME") + "/.config"
-	}
-	file := xdg + "/gotop/" + name + ".json"
+	file := configDir + name + ".json"
 	dat, err := ioutil.ReadFile(file)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: colorscheme not recognized\n")
@@ -262,6 +277,14 @@ func initWidgets() {
 }
 
 func main() {
+	// logging
+	f, err := os.OpenFile(configDir+"main.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error opening file: %v", err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
 	cliArguments()
 
 	keyBinds()

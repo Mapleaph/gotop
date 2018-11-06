@@ -5,7 +5,10 @@ import (
 )
 
 func (self *Temp) update() {
-	sensors, _ := psHost.SensorsTemperatures()
+	sensors, err := psHost.SensorsTemperatures()
+	if err != nil {
+		// return err
+	}
 	for _, sensor := range sensors {
 		self.Data[sensor.SensorKey] = int(sensor.Temperature)
 	}

@@ -37,8 +37,14 @@ func NewMem(interval time.Duration, zoom int) *Mem {
 }
 
 func (self *Mem) update() {
-	main, _ := psMem.VirtualMemory()
-	swap, _ := psMem.SwapMemory()
+	main, err := psMem.VirtualMemory()
+	if err != nil {
+		// return err
+	}
+	swap, err := psMem.SwapMemory()
+	if err != nil {
+		// return err
+	}
 	self.Data["Main"] = append(self.Data["Main"], main.UsedPercent)
 	self.Data["Swap"] = append(self.Data["Swap"], swap.UsedPercent)
 

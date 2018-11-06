@@ -52,7 +52,10 @@ func NewDisk() *Disk {
 }
 
 func (self *Disk) update() {
-	Partitions, _ := psDisk.Partitions(false)
+	Partitions, err := psDisk.Partitions(false)
+	if err != nil {
+		// return err
+	}
 
 	// add partition if it's new
 	for _, Part := range Partitions {
@@ -86,13 +89,19 @@ func (self *Disk) update() {
 
 	// updates partition info
 	for _, Part := range self.Partitions {
-		usage, _ := psDisk.Usage(Part.Mount)
+		usage, err := psDisk.Usage(Part.Mount)
+		if err != nil {
+			// return err
+		}
 		Part.UsedPercent = int(usage.UsedPercent)
 
 		Free, Mag := utils.ConvertBytes(usage.Free)
 		Part.Free = fmt.Sprintf("%3d%s", uint64(Free), Mag)
 
-		ret, _ := psDisk.IOCounters("/dev/" + Part.Device)
+		ret, err := psDisk.IOCounters("/dev/" + Part.Device)
+		if err != nil {
+			// return err
+		}
 		data := ret[Part.Device]
 		curRead, curWrite := data.ReadBytes, data.WriteBytes
 		if Part.TotalRead != 0 { // if this isn't the first update

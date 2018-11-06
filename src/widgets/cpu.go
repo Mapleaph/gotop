@@ -2,6 +2,7 @@ package widgets
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/cjbassi/gotop/src/utils"
@@ -18,7 +19,10 @@ type CPU struct {
 }
 
 func NewCPU(interval time.Duration, zoom int, average bool, percpu bool) *CPU {
-	count, _ := psCPU.Counts(false)
+	count, err := psCPU.Counts(false)
+	if err != nil {
+		// return err
+	}
 	self := &CPU{
 		LineGraph: ui.NewLineGraph(),
 		Count:     count,
@@ -62,9 +66,14 @@ func NewCPU(interval time.Duration, zoom int, average bool, percpu bool) *CPU {
 
 // calculates the CPU usage over a 1 second interval and blocks for the duration
 func (self *CPU) update() {
+
+	log.Println("hi")
 	if self.Average {
 		go func() {
-			percent, _ := psCPU.Percent(self.interval, false)
+			percent, err := psCPU.Percent(self.interval, false)
+			if err != nil {
+				// return err
+			}
 			self.Data["AVRG"] = append(self.Data["AVRG"], percent[0])
 			self.Labels["AVRG"] = fmt.Sprintf("%3.0f%%", percent[0])
 		}()
@@ -72,9 +81,15 @@ func (self *CPU) update() {
 
 	if self.PerCPU {
 		go func() {
-			percents, _ := psCPU.Percent(self.interval, true)
+			percents, err := psCPU.Percent(self.interval, true)
+			if err != nil {
+				// return err
+			}
 			if len(percents) != self.Count {
-				count, _ := psCPU.Counts(false)
+				count, err := psCPU.Counts(false)
+				if err != nil {
+					// return err
+				}
 				utils.Error("CPU percentages",
 					fmt.Sprint(
 						"self.Count: ", self.Count, "\n",

@@ -22,15 +22,27 @@ func (self *Proc) update() {
 }
 
 func Processes() []Process {
-	output, _ := exec.Command("ps", "-axo", "pid,comm,pcpu,pmem,args").Output()
+	output, err := exec.Command("ps", "-axo", "pid,comm,pcpu,pmem,args").Output()
+	if err != nil {
+		// return err
+	}
 	// converts to []string and removes the header
 	strOutput := strings.Split(strings.TrimSpace(string(output)), "\n")[1:]
 	processes := []Process{}
 	for _, line := range strOutput {
 		split := strings.Fields(line)
-		pid, _ := strconv.Atoi(split[0])
-		cpu, _ := strconv.ParseFloat(split[2], 64)
-		mem, _ := strconv.ParseFloat(split[3], 64)
+		pid, err := strconv.Atoi(split[0])
+		if err != nil {
+			// return err
+		}
+		cpu, err := strconv.ParseFloat(split[2], 64)
+		if err != nil {
+			// return err
+		}
+		mem, err := strconv.ParseFloat(split[3], 64)
+		if err != nil {
+			// return err
+		}
 		process := Process{
 			PID:     pid,
 			Command: split[1],

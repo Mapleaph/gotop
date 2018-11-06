@@ -38,7 +38,10 @@ type Proc struct {
 }
 
 func NewProc(keyPressed chan bool) *Proc {
-	cpuCount, _ := psCPU.Counts(false)
+	cpuCount, err := psCPU.Counts(false)
+	if err != nil {
+		// return err
+	}
 	self := &Proc{
 		Table:      ui.NewTable(),
 		interval:   time.Second,

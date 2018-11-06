@@ -13,7 +13,7 @@ github.com/go-ole/go-ole/oleutil
 github.com/mattn/go-runewidth
 # github.com/nsf/termbox-go v0.0.0-20180407224525-3e24a7b6661e
 github.com/nsf/termbox-go
-# github.com/shirou/gopsutil v0.0.0-20180811135056-68ff0e299699
+# github.com/shirou/gopsutil v2.18.11-0.20181106135613-4254ce2081c0+incompatible
 github.com/shirou/gopsutil/cpu
 github.com/shirou/gopsutil/disk
 github.com/shirou/gopsutil/host

@@ -18,7 +18,7 @@ import (
 	"github.com/docopt/docopt-go"
 )
 
-var version = "1.5.1"
+var version = "1.5.2"
 
 var (
 	termResized = make(chan bool, 1)
@@ -35,7 +35,7 @@ var (
 	colorscheme = colorschemes.Default
 
 	minimal      = false
-	widgetCount  = 6
+	widgetCount  = 7
 	interval     = time.Second
 	zoom         = 7
 	zoomInterval = 3
@@ -49,6 +49,7 @@ var (
 	net  *w.Net
 	disk *w.Disk
 	temp *w.Temp
+	volt *w.Volt
 
 	help *w.HelpMenu
 )
@@ -142,11 +143,11 @@ func setupGrid() {
 		ui.Body.Set(0, 6, 6, 12, mem)
 		ui.Body.Set(6, 6, 12, 12, proc)
 	} else {
-		ui.Body.Set(0, 0, 12, 4, cpu)
-
-		ui.Body.Set(0, 4, 4, 6, disk)
-		ui.Body.Set(0, 6, 4, 8, temp)
-		ui.Body.Set(4, 4, 12, 8, mem)
+		ui.Body.Set(0, 0, 6, 4, cpu)
+		ui.Body.Set(6, 0, 12, 4, volt)
+		ui.Body.Set(0, 4, 6, 6, disk)
+		ui.Body.Set(0, 6, 6, 8, temp)
+		ui.Body.Set(6, 4, 12, 8, mem)
 
 		ui.Body.Set(0, 8, 6, 12, net)
 		ui.Body.Set(6, 8, 12, 12, proc)
@@ -224,6 +225,8 @@ func widgetColors() {
 	if !minimal {
 		temp.TempLow = ui.Color(colorscheme.TempLow)
 		temp.TempHigh = ui.Color(colorscheme.TempHigh)
+		volt.VoltLow = ui.Color(colorscheme.TempLow)
+		volt.VoltHigh = ui.Color(colorscheme.TempHigh)
 	}
 }
 
@@ -256,6 +259,10 @@ func initWidgets() {
 			temp = w.NewTemp()
 			wg.Done()
 		}()
+		go func() {
+		    volt = w.NewVolt()
+		    wg.Done()
+	    }()
 	}
 
 	wg.Wait()
